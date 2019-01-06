@@ -1,6 +1,6 @@
 # Roomba-Scheduler-Open-Interface v0.1
 
-This is an .NET Application developed in VB.NET to bring easy and acces to users who desire to run a Schedule Script on their Roomba 500 and 600 series using the Open Interface Port.
+This is an .NET Application developed in VB.NET to bring easy acces to users who desire to run a Schedule Script on their Roomba 500 and 600 series using the Open Interface Port.
 
 ![alt text](https://github.com/PiecePaperCode/Roomba-Scheduler-Open-Interface/blob/master/Screenshot.PNG)
 
@@ -20,7 +20,7 @@ It was developed with VB.NET on Visual Studio 17 on an WIN 10 Machine
 
 ## Authors
 
-* **PiecepaperCode** - *Initial work* 
+* **PiecePaperCode** - *Initial work* 
 
 ## License
 
