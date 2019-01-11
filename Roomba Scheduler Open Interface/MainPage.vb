@@ -18,60 +18,37 @@ Public Class MainPage
         COM_Port_Combobox.Items.Add("COM4")
         COM_Port_Combobox.Items.Add("COM5")
         COM_Port_Combobox.Items.Add("COM6")
-        'Define Stuff inside the Combobox to avoid Try Stetement
+        COM_Port_Combobox.Items.Add("COM7")
+        COM_Port_Combobox.Items.Add("COM8")
+        'Define Stuff inside the Combobox to avoid Try Statement
         COM_Port_Combobox.SelectedItem = "COM1"
         Series_Combobox.SelectedItem = "500 Series"
     End Sub
 
-    '<Define FirstDayOfWeek>
+    '<Define FirstDayOfWeek> Define Sunday as First Day of the Week
     Public Enum FirstDayOfWeek
         Sunday
     End Enum
-
-    '<COMPORT Initialise>
-    Function InitialiseCOMPORT()
-        If Series_Combobox.SelectedItem = "500 Series" Then Baudrate = 115200
-        If Series_Combobox.SelectedItem = "600 Series" Then Baudrate = 115200
-        '<Define Serial Port>
-        MyCOMPort = New SerialPort()
-        MyCOMPort.PortName = COM_Port_Combobox.SelectedItem         'Assign the port name to the MyCOMPort object
-        MyCOMPort.BaudRate = Baudrate                               'Assign the Baudrate to the MyCOMPort object
-        MyCOMPort.Parity = Parity.None                              'Parity bits = none  
-        MyCOMPort.DataBits = 8                                      'No of Data bits = 8
-        MyCOMPort.StopBits = StopBits.One                           'No of Stop bits = 1
-    End Function
-    '<Test Connection>
-    Public Sub TestConnection_Button_Click(sender As Object, e As EventArgs) Handles TestConnection_Button.Click
-        Call InitialiseCOMPORT()
-        ' Hex Values to Send to Start a BeeP Test Song
-        Dim HexBeep As Byte() = {&H80, &H83, &H8C, &H1, &H1, &H55, &H20, &H8D, &H1}
-
-        Try
-            MyCOMPort.Open()                            ' Open the port
-            MyCOMPort.Write(HexBeep, 0, 9)              ' Write "Beep 9 Hex Signals"
-            Threading.Thread.Sleep(100)
-            MyCOMPort.Write(HexBeep, 0, 9)
-            MyCOMPort.Close()                           ' Close port
-            'Reset Roomba to Passive Mode 128 After 1 Sec for futher use
-            Threading.Thread.Sleep(1000)
-            Dim HexReset As Byte() = {&H80}
-            MyCOMPort.Open()                            ' Open the port
-            MyCOMPort.Write(HexReset, 0, 1)             ' Write "Reset 128 in Hex"
-            MyCOMPort.Close()                           ' Close port
-        Catch ex As Exception
-            MessageBox.Show("unable to connect to the selected COM Port", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Error)
-        End Try
-    End Sub
 
     '<System Time> Show and Update System Time to the Programm
     Private Sub SystemZeitTimer_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         SystemTime_Label.Text = DateTime.Now
     End Sub
 
-    '<Flash Button> This is the Main Part where the selected Schedule is applyed to the Roomba
-    Public Sub Flash_Button_Click(sender As Object, e As EventArgs) Handles Flash_Button.Click
-        Call InitialiseCOMPORT()
-        '<Set Roombas System Time> Update Roombas internal Time to the System Time
+    '<Function> InitialiseCOMPORT
+    Function Initialise_COMPORT()
+        If Series_Combobox.SelectedItem = "500 Series" Then Baudrate = 115200
+        If Series_Combobox.SelectedItem = "600 Series" Then Baudrate = 115200 'Here it would be possible to add new models
+        MyCOMPort = New SerialPort()
+        MyCOMPort.PortName = COM_Port_Combobox.SelectedItem         'Assign the port name/number to the MyCOMPort object
+        MyCOMPort.BaudRate = Baudrate                               'Assign the Baudrate to the MyCOMPort object
+        MyCOMPort.Parity = Parity.None                              'Parity bits = none  
+        MyCOMPort.DataBits = 8                                      'No of Data bits = 8
+        MyCOMPort.StopBits = StopBits.One                           'No of Stop bits = 1
+    End Function
+
+    '<Function> 'DayoftheWeek in Hex for Roomba
+    Function DayofWeek_to_Roomba()
         Dim DaySetHex As String = &H0
         If DateTime.Now.DayOfWeek.ToString = "Sunday" Then DaySetHex = &H0
         If DateTime.Now.DayOfWeek.ToString = "Monday" Then DaySetHex = &H1
@@ -80,21 +57,17 @@ Public Class MainPage
         If DateTime.Now.DayOfWeek.ToString = "Thursday" Then DaySetHex = &H4
         If DateTime.Now.DayOfWeek.ToString = "Friday" Then DaySetHex = &H5
         If DateTime.Now.DayOfWeek.ToString = "Saturday" Then DaySetHex = &H6
-        Dim HourSet As Integer = TimeOfDay.Hour
-        Dim MinuteSet As Integer = TimeOfDay.Minute
-        Dim HexHourSet As String = "&H" & Hex(HourSet)
-        Dim HexMinuteSet As String = "&H" & Hex(MinuteSet)
-        Dim SetDate As Byte() = {&H80, &HA8, DaySetHex, HexHourSet, HexMinuteSet}
-        MyCOMPort.Open()                          ' Open the port
-        MyCOMPort.Write(SetDate, 0, 5)            ' Write Actual Time to Serial"
-        MyCOMPort.Close()                         ' Close port
+        Return DaySetHex
+    End Function
 
-        'Roomba Documentation Speeks of Days as Values who needs to be added to determine on Wich Days the Roomba Robot would work
-        ' Value | For each Day 
-        '1 | Sunday 
-        '2 | Monday 
-        '4 | Tuesday 
-        '8 | Wednesday 
+    '<Function> Add the Selected Active Days
+    Function Selected_Active_Days_Hex()
+        'Roomba Documentation Speeks of Days as Values who needs to be added to determine on Wich Days the Roomba Robot would clean
+        ' Value | For each Day Who need to be added 0 if it is not selected
+        '1  | Sunday 
+        '2  | Monday 
+        '4  | Tuesday 
+        '8  | Wednesday 
         '16 | Thursday 
         '32 | Friday 
         '64 | Saturday 
@@ -110,67 +83,98 @@ Public Class MainPage
         'Add The Day Values to tell the Roomba on How Many Days the Roomba would be Active
         Days = Sonntag + Montag + Dienstag + Mittwoch + Donnerstag + Freitag + Samstag
         Dim DaysHex As String = "&H" & Hex(Days)
+        Return DaysHex
+    End Function
+
+    '<Funktion> 'Actual Time to Roomba in Format [Wake Up, Change-Time, Day, Hour, Minute] as HEX Values
+    Function Write_Actual_Time_to_Roomba()
+        Dim DaySetHex As String = DayofWeek_to_Roomba()                                 'Function to call DayofWeek in Rommba Hex
+        Dim HexHourSet As String = "&H" & Hex(TimeOfDay.Hour)                           'TimeofDay.Hour in Hex Format
+        Dim HexMinuteSet As String = "&H" & Hex(TimeOfDay.Minute)                       'TimeofDay.Minute in Hex Format
+        Dim SetDateHEX As Byte() = {&H80, &HA8, DaySetHex, HexHourSet, HexMinuteSet}    'Time to Roomba in Format [Wake Up, Change-Time, Day, Hour, Minute] as HEX Values
+        MyCOMPort.Open()                                                                'Open the port
+        MyCOMPort.Write(SetDateHEX, 0, 5)                                               'Write Actual Time to Serial"
+        MyCOMPort.Close()                                                               'Close port
+        FlashOutput_Label.Text = "HEX: " & vbCrLf &
+            String.Join(" ", "80", "A8", DaySetHex, HexHourSet, HexMinuteSet).Replace("H", "")            'Display Written Bytes As Hex Values to the User
+    End Function
+
+    '<Test Connection>
+    Public Sub TestConnection_Button_Click(sender As Object, e As EventArgs) Handles TestConnection_Button.Click
+        Call Initialise_COMPORT()
+        Dim HexBeep As Byte() = {&H80, &H83, &H8C, &H1, &H1, &H55, &H20, &H8D, &H1}         ' Hex Values to Send to Start a BeeP TesT
+        Try
+            MyCOMPort.Open()                                        'Open the port
+            MyCOMPort.Write(HexBeep, 0, 9)                          'Write "Beep 9 Hex Signals
+            Threading.Thread.Sleep(100)                             'Sleep for Beep to be Heard
+            MyCOMPort.Write(HexBeep, 0, 9)                          'Write "Beep 9 Hex Signals 2nd Time to Hear the Actual Bee
+            MyCOMPort.Close()                                       'Close port
+            Threading.Thread.Sleep(1000)                            'Sleep for Beep to be Heard
+            Dim HexReset As Byte() = {&H80}                         'Reset Roomba to Passive Mode 128 After 1 Sec for futher use
+            MyCOMPort.Open()                                        'Open the port
+            MyCOMPort.Write(HexReset, 0, 1)                         'Write "Reset 128 in Hex"
+            MyCOMPort.Close()                                       'Close port
+            FlashOutput_Label.Text = "HEX: " & vbCrLf & String.Join(" ", "80", "83", "8C", "1", "1", "55", "20", "8D", "1")
+        Catch ex As Exception
+            MessageBox.Show("unable to connect to the selected COM Port", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    '<Flash Button> This is the Main Part where the selected Schedule is applyed to the Roomba
+    Public Sub Flash_Button_Click(sender As Object, e As EventArgs) Handles Flash_Button.Click
+        Call Initialise_COMPORT()                                   'Initialise COMPORT
+        Call Write_Actual_Time_to_Roomba()                          'Write Time to Roomba in Format [Wake Up, Change-Time, Day, Hour, Minute] as HEX Values
+        Dim DaysHEX As String = Selected_Active_Days_Hex()          'Add the Selected Active Days to know on wich day the Roomba would clean
+
+        'Nummeric Updown As New List to Collect all the Userinputs from the User
+        Dim Selected_Hour_Minutes As New List(Of NumericUpDown)() From {
+            Sunday_h_NumUpDown, Sunday_min_NumUpDown,
+            Monday_h_NumUpDown, Monday_min_NumUpDown,
+            Tuesday_h_NumUpDown, Tuesday_min_NumUpDown,
+            Wednesday_h_NumUpDown, Wednesday_min_NumUpDown,
+            Thursday_h_NumUpDown, Thursday_min_NumUpDown,
+            Friday_h_NumUpDown, Friday_min_NumUpDown,
+            Saturday_h_NumUpDown, Saturday_min_NumUpDown}
+
+        'Convert all Days User set Time hours and Minutes to Theyre Hex Values And use an Array to make Things Simpler
+        Dim Selected_Hour_Minutes_HEX(13) As String
+        Dim i As Integer = 0
+        For Each St As NumericUpDown In Selected_Hour_Minutes
+            Selected_Hour_Minutes_HEX(i) = "&H" & Hex(St.Value)
+            i = i + 1
+        Next
 
         '[167] [Days] [Sun Hour] [Sun Minute] [Mon Hour] [Mon Minute] [Tue Hour] [Tue
         'Minute()] [Wed Hour] [Wed Minute] [Thu Hour] [Thu Minute] [Fri Hour] [Fri Minute] [Sat Hour] [Sat
         'Minute()] 
-
-        'Convert all Days User set Time hours and Minutes to Theyre Hex Values
-        'Sunday
-        Dim SonntagHHex, SonntagMinHex As String
-        SonntagHHex = "&H" & Hex(Sunday_h_NumUpDown.Value)
-        SonntagMinHex = "&H" & Hex(Sunday_min_NumUpDown.Value)
-        'Monday
-        Dim MontagHHex, MontagMinHex As String
-        MontagHHex = "&H" & Hex(Monday_h_NumUpDown.Value)
-        MontagMinHex = "&H" & Hex(Monday_min_NumUpDown.Value)
-        'Tuesday
-        Dim DienstagHHex, DienstagMinHex As String
-        DienstagHHex = "&H" & Hex(Tuesday_h_NumUpDown.Value)
-        DienstagMinHex = "&H" & Hex(Tuesday_min_NumUpDown.Value)
-        'Wednesday
-        Dim MittwochHHex, MittwochMinHex As String
-        MittwochHHex = "&H" & Hex(Wednesday_h_NumUpDown.Value)
-        MittwochMinHex = "&H" & Hex(Wednesday_min_NumUpDown.Value)
-        'Thursday
-        Dim DonnerstagHHex, DonnerstagMinHex As String
-        DonnerstagHHex = "&H" & Hex(Thursday_h_NumUpDown.Value)
-        DonnerstagMinHex = "&H" & Hex(Thursday_min_NumUpDown.Value)
-        'Friday
-        Dim FreitagHHex, FreitagMinHex As String
-        FreitagHHex = "&H" & Hex(Friday_h_NumUpDown.Value)
-        FreitagMinHex = "&H" & Hex(Friday_min_NumUpDown.Value)
-        'Saturday
-        Dim SamstagHHex, SamstagMinHex As String
-        SamstagHHex = "&H" & Hex(Saturday_h_NumUpDown.Value)
-        SamstagMinHex = "&H" & Hex(Saturday_min_NumUpDown.Value)
-
         'Collect the and arranging all the Values to be send as Hex Values to the Roomba
-        Dim SetSchedule As Byte() = {&H80, &HA7, DaysHex, SonntagHHex}
-        Dim SetSchedule2 As Byte() = {SonntagMinHex, MontagHHex, MontagMinHex, DienstagHHex}
-        Dim SetSchedule3 As Byte() = {DienstagMinHex, MittwochHHex, MittwochMinHex, DonnerstagHHex}
-        Dim SetSchedule4 As Byte() = {DonnerstagMinHex, FreitagHHex, FreitagMinHex, SamstagHHex, SamstagMinHex}
+        Dim SetSchedule As Byte() = {&H80, &HA7, DaysHEX, Selected_Hour_Minutes_HEX(0)}
+        Dim SetSchedule2 As Byte() = {Selected_Hour_Minutes_HEX(1), Selected_Hour_Minutes_HEX(2), Selected_Hour_Minutes_HEX(3), Selected_Hour_Minutes_HEX(4)}
+        Dim SetSchedule3 As Byte() = {Selected_Hour_Minutes_HEX(5), Selected_Hour_Minutes_HEX(6), Selected_Hour_Minutes_HEX(7), Selected_Hour_Minutes_HEX(8)}
+        Dim SetSchedule4 As Byte() = {Selected_Hour_Minutes_HEX(9), Selected_Hour_Minutes_HEX(10), Selected_Hour_Minutes_HEX(11), Selected_Hour_Minutes_HEX(12), Selected_Hour_Minutes_HEX(13)}
 
-        'Actual Write to Serial Port
-        MyCOMPort.Open()                             ' Open the port
-        MyCOMPort.Write(SetSchedule, 0, 4)           ' Write the Schedule to Serial"
-        MyCOMPort.Write(SetSchedule2, 0, 4)          ' Write the Schedule to Serial"
-        MyCOMPort.Write(SetSchedule3, 0, 4)          ' Write the Schedule to Serial"
-        MyCOMPort.Write(SetSchedule4, 0, 5)          ' Write the Schedule to Serial"
-        MyCOMPort.Close()
+        Try
+            'Actual Write to Serial Port
+            MyCOMPort.Open()                             ' Open the port
+            MyCOMPort.Write(SetSchedule, 0, 4)           ' Write the Schedule to Serial"
+            MyCOMPort.Write(SetSchedule2, 0, 4)          ' Write the Schedule to Serial"
+            MyCOMPort.Write(SetSchedule3, 0, 4)          ' Write the Schedule to Serial"
+            MyCOMPort.Write(SetSchedule4, 0, 5)          ' Write the Schedule to Serial"
+            MyCOMPort.Close()
+        Catch ex As Exception
+            MessageBox.Show("unable to connect to the selected COM Port", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
 
-        'Converting to HEX DRY Note remove it and write the definitive 
-        Dim HexHourSetLabel As String = Hex(HourSet)
-        Dim HexMinuteSetLabel As String = Hex(MinuteSet)
+        'User Feedback Beep for Successfully Inserting a Schedule
+        Me.TestConnection_Button_Click(sender, New System.EventArgs())
 
-        '<Format THe OutPut> Note use String.Join in the Future
-        FlashOutput_Label.Text = "HEX" & vbCrLf & "80 " & "A8 " & DaySetHex &
-            " " & HexHourSetLabel & " " & HexMinuteSetLabel & " 80 A8 A7 " &
-            Hex(Days) & " " & Hex(Sunday_h_NumUpDown.Value) & " " & Hex(Sunday_min_NumUpDown.Value) & " " & Hex(Monday_h_NumUpDown.Value) &
-            " " & Hex(Monday_min_NumUpDown.Value) & " " & Hex(Tuesday_h_NumUpDown.Value) & " " & Hex(Tuesday_min_NumUpDown.Value) &
-            " " & Hex(Wednesday_h_NumUpDown.Value) & " " & Hex(Wednesday_min_NumUpDown.Value) & " " & Hex(Thursday_h_NumUpDown.Value) &
-            " " & Hex(Thursday_min_NumUpDown.Value) & " " & Hex(Friday_h_NumUpDown.Value) &
-            " " & Hex(Friday_min_NumUpDown.Value) & " " & Hex(Saturday_h_NumUpDown.Value) & " " & Hex(Saturday_min_NumUpDown.Value)
+        '<Format THe OutPut> To Display to the User
+        Dim Text_Output_Text As String = String.Join(" ", "80", "A7", DaysHEX, Selected_Hour_Minutes_HEX(0),
+                                                        Selected_Hour_Minutes_HEX(1), Selected_Hour_Minutes_HEX(2), Selected_Hour_Minutes_HEX(3), Selected_Hour_Minutes_HEX(4),
+                                                        Selected_Hour_Minutes_HEX(5), Selected_Hour_Minutes_HEX(6), Selected_Hour_Minutes_HEX(7), Selected_Hour_Minutes_HEX(8),
+                                                        Selected_Hour_Minutes_HEX(9), Selected_Hour_Minutes_HEX(10), Selected_Hour_Minutes_HEX(11), Selected_Hour_Minutes_HEX(12),
+                                                        Selected_Hour_Minutes_HEX(13))
+        FlashOutput_Label.Text += vbCrLf & Text_Output_Text.Replace("H", "")
     End Sub
 
     'Close the Application

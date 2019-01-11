@@ -92,7 +92,7 @@ Partial Class MainPage
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(675, 42)
         Me.Label1.TabIndex = 0
-        Me.Label1.Text = "Roomba Scheduler Open Interface v0.1"
+        Me.Label1.Text = "Roomba Scheduler Open Interface v0.2"
         '
         'Label2
         '
