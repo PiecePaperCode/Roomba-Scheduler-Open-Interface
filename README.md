@@ -2,7 +2,10 @@
 
 This is an .NET Application developed in VB.NET to bring easy acces to users who desire to run a Schedule Script on their Roomba 500 and 600 series using the Open Interface Port.
 
-This is useful for those don't want to use arduino or other ESP8266 modules: you need only PC and FTDI USB module.
+This is useful for those don't want to use arduino or other ESP8266 modules: you need only PC and FTDI USB module:  Arduino - - FTDI GND to Roomba ground (pin 6 or other pin of ESP)
+- FTDI TX to Roomba RX (pin 3)
+
+Now, the moment of truth. Press the "CLEAN" button on the Roomba, the light should go on. Plug in the USB for the Arduino. The Roomba light should turn off briefly, and after a few seconds the Arduino should blink it's LED. The schedule is now programmed, all done!
 
 ![alt text](https://github.com/PiecePaperCode/Roomba-Scheduler-Open-Interface/blob/master/Pictures/Screenshot_1.PNG)
 
