@@ -1,4 +1,4 @@
-# Roomba-Scheduler-Open-Interface v0.2
+# Roomba-Scheduler-Open-Interface v0.2 without ESP8266 module
 
 This is an .NET Application developed in VB.NET to bring easy acces to users who desire to run a Schedule Script on their Roomba 500 and 600 series using the Open Interface Port.
 
