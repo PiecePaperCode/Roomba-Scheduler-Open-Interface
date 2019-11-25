@@ -36,7 +36,7 @@ YOU HAVE TO CONNECT ONLY GND AND RX PIN OF ROOMBA!
 This is useful for those don't want to use arduino or other ESP8266 modules: you need only PC and FTDI USB module:  Arduino - - FTDI GND to Roomba ground (pin 6 or other pin of ESP)
 - FTDI TX to Roomba RX (pin 3)
 
-Now, the moment of truth. Press the "CLEAN" button on the Roomba, the light should go on. Test connectin and then flash it. The Roomba light should turn off briefly. If you see 3 lines on bootm-left all it's gone OK! The schedule is now programmed, all done!
+Now, the moment of truth. Press the "CLEAN" button on the Roomba, the light should go on. Test connection and then flash it. The Roomba light should turn off briefly and then beep. If you see 3 lines on bootm-left all it's gone OK! The schedule is now programmed, all done!
 
 ![alt text](https://github.com/PiecePaperCode/Roomba-Scheduler-Open-Interface/blob/master/Pictures/Screenshot_1.PNG)
 
