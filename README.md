@@ -37,7 +37,7 @@ This is useful for those don't want to use arduino or other ESP8266 modules: you
 - FTDI TX to Roomba RX (pin 3)
 
 Check right COM port using computer properties and select this config:
-- Baud: 115200 or 19200 (see below) 
+- Baud: 115200
 - Data bits: 8
 - Parity: None
 - Stop bits: 1
