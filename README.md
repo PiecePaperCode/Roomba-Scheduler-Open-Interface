@@ -7,7 +7,7 @@ This is an .NET Application developed in VB.NET to bring easy acces to users who
  ### 0) Prerequisities
  - PC WINDOWS (XP, vista, 7, 8)
  - FTDI programmer
- - n.2 wires each one with 1 male dupont connector and 1 female dupont connectr
+ - n.2 wires each one with 1 male dupont connector and 1 female dupont connector
  
  ### 1) Install .NET Framework v4.7 or newest
 
@@ -36,7 +36,9 @@ YOU HAVE TO CONNECT ONLY GND AND RX PIN OF ROOMBA!
 This is useful for those don't want to use arduino or other ESP8266 modules: you need only PC and FTDI USB module:  Arduino - - FTDI GND to Roomba ground (pin 6 or other pin of ESP)
 - FTDI TX to Roomba RX (pin 3)
 
-Now, the moment of truth. Press the "CLEAN" button on the Roomba, the light should go on. Test connection and then flash it. The Roomba light should turn off briefly and then beep. If you see 3 lines on bootm-left all it's gone OK! The schedule is now programmed, all done!
+Check right COM port using computer properties, and select speed 115200 baud for your COM port.
+
+Now, the moment of truth. Press the "CLEAN" button on the Roomba, the light should go on. Test connection (roomba need to beep) and then flash it (roomba need to beep again). The Roomba light should turn off briefly and then beep. If you see 3 lines on bootm-left all it's gone OK! The schedule is now programmed, all done!
 
 ![alt text](https://github.com/PiecePaperCode/Roomba-Scheduler-Open-Interface/blob/master/Pictures/Screenshot_1.PNG)
 
@@ -50,7 +52,7 @@ It was developed with VB.NET on Visual Studio 17 on an WIN 10 Machine (I don't b
 
 0.1 Initial Release
 
-0.2 Release
+0.2 Final Release
 
 ## Authors
 
