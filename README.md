@@ -36,7 +36,12 @@ YOU HAVE TO CONNECT ONLY GND AND RX PIN OF ROOMBA!
 This is useful for those don't want to use arduino or other ESP8266 modules: you need only PC and FTDI USB module:  Arduino - - FTDI GND to Roomba ground (pin 6 or other pin of ESP)
 - FTDI TX to Roomba RX (pin 3)
 
-Check right COM port using computer properties, and select speed 115200 baud for your COM port.
+Check right COM port using computer properties and select this config:
+- Baud: 115200 or 19200 (see below) 
+- Data bits: 8
+- Parity: None
+- Stop bits: 1
+- Flow control: None
 
 Now, the moment of truth. Press the "CLEAN" button on the Roomba, the light should go on. Test connection (roomba need to beep) and then flash it (roomba need to beep again). The Roomba light should turn off briefly and then beep. If you see 3 lines on bootm-left all it's gone OK! The schedule is now programmed, all done!
 
