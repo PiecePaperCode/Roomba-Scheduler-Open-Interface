@@ -53,6 +53,8 @@ Between each configuration/connection I suggest to do a factory default reset to
 
 Changes mode to: Passive. Roomba beeps once to acknowledge it is starting from “off” mode. This isn't good news!
 
+To disable scheduled cleaning, send all 0s.
+
 ## Deployment
 
 It was developed with VB.NET on Visual Studio 17 on an WIN 10 Machine (I don't be able to find right .NET  package for WIN 10)
