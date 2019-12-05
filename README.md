@@ -53,7 +53,7 @@ Between each configuration/connection I suggest to do a factory default reset to
 
 Changes mode to: Passive. Roomba beeps once to acknowledge it is starting from “off” mode. This isn't good news!
 
-To disable scheduled cleaning, send all 0s.
+To disable scheduled cleaning, send all 0s, so you can send: [167] [0] [0] [0] [0] [0] [0] [0] [0] [0] [0] [0] [0] [0] [0] [0]
 
 ## Deployment
 
