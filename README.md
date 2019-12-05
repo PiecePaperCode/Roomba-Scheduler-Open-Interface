@@ -51,6 +51,8 @@ Now, the moment of truth. Press the "CLEAN" button on the Roomba, the light shou
 
 Between each configuration/connection I suggest to do a factory default reset to be sure the roomba isn't in a strange/wrong state (ex. safe mode): you can do it please press and Hold the Dock and Spot button down for 10 seconds then release. I notice a strange state where to wake up and start to clean I have to press clean button for 3 or 4 times; after reset procedure all work fine and Roomba seem to wake up fine! This problem can prevent to start scheduled cleaning!
 
+Changes mode to: Passive. Roomba beeps once to acknowledge it is starting from “off” mode. This isn't good news!
+
 ## Deployment
 
 It was developed with VB.NET on Visual Studio 17 on an WIN 10 Machine (I don't be able to find right .NET  package for WIN 10)
